@@ -1,12 +1,19 @@
 
 
 #Hash of possible win positions based around which squares are current empty.
-CHECK_HASH = {1 => [[1,2],[3,6],[4,8]],2 => [[0,2],[4,7]],3 => [[0,1],[5,8],[4,7]],
-              4 => [[0,6],[4,5]],5 => [[0,8],[1,7],[2,6],[3,5]], 
-              6 => [[3,4],[2,8]],7 => [[0,3],[7,8],[2,4]],8=>[[1,4],[6,8]],  
-              9 => [[6,7],[2,5],[0,4]]}
+CHECK_HASH = {
+  1 => [[1,2],[3,6],[4,8]],
+  2 => [[0,2],[4,7]],
+  3 => [[0,1],[5,8],[4,7]],
+  4 => [[0,6],[4,5]],
+  5 => [[0,8],[1,7],[2,6],[3,5]], 
+  6 => [[3,4],[2,8]],
+  7 => [[0,3],[7,8],[2,4]],
+  8 => [[1,4],[6,8]],  
+  9 => [[6,7],[2,5],[0,4]]
+}
                
-#Set the initial data for the game board
+
 def initialize_board
   board = {}
   (1..9).each { |k| board[k] = ' ' }
@@ -56,19 +63,17 @@ end
 
 
 #This method is used for computer logic.  It allows the computer to decide whether 
-#to block the player go try to win the game under differing circumstances.
+#to block the player or to try to win the game under differing circumstances.
 def move_if_two_in_a_row(board,player_letter)
-  
-  squares_to_check = empty_squares(board)
-  
+
   if board.values.count(player_letter) >= 2
     move =
-    squares_to_check.
-    find{|e| CHECK_HASH[e].
-    #Checks any of the possible winning conditions around an empty square
-    #If any one has two marks, the computer will block.  
-    any?{|v| board.
-    values[v[0]] == player_letter && board.values[v[1]] == player_letter} }
+    empty_squares(board).find do |empty_square|
+      CHECK_HASH[empty_square].any? do |value|
+        board.values[value[0]] == player_letter &&
+        board.values[value[1]] == player_letter
+      end
+    end
   end
 
   return move
@@ -89,53 +94,69 @@ def say_who_won(player,computer)
 end
 
 
-def horizontal_win?(idx,vals)
+def horizontal_win?(position,squares,letter)
     bool_horizontal = 
-    [vals[idx * 3],vals[(idx * 3) + 1],vals[(idx * 3) + 2]].all? {|e| e == letter}
+    [squares[position * 3],
+    squares[(position * 3) + 1],
+    squares[(position * 3) + 2]].all? {|e| e == letter}
     
     return bool_horizontal
 end
 
 
-def vertical_win?(idx,vals)
+def vertical_win?(position,squares,letter)
     bool_vertical = 
-    [vals[idx],vals[idx + 3],vals[idx + 6]].all? {|e| e == letter}
-    return true if bool_v  
+    [squares[position],
+    squares[position + 3],
+    squares[position + 6]].all? {|e| e == letter}
+
+    return bool_vertical  
 end
 
 
-def diagonal_win?(vals)
-  return true if [vals[0],vals[4],vals[8]].all? {|e| e == letter}
-  return true if [vals[2],vals[4],vals[6]].all? {|e| e == letter}
+def diagonal_win?(squares,letter)
+  return [squares[0],squares[4],squares[8]].all? {|e| e == letter}
+  return [squares[2],squares[4],squares[6]].all? {|e| e == letter}
 end
 
 
 def winner?(board,letter)
-  vals = board.values
-  idx = 0
+  squares = board.values
+  position = 0
   
   begin  
-    return true if horizontal_win?(idx,vals)
-    return true if vertical_win?(idx,vals)
-    idx += 1
-  end while idx < 3
+    return true if horizontal_win?(position,squares,letter)
+    return true if vertical_win?(position,squares,letter)
+    position += 1
+  end while position < 3
 
-  return true if diagonal_win?(vals)
-  return nil
+  return true if diagonal_win?(squares,letter)
+
+  return false
 end  
 
 #Prompt the player to pick a letter, either X or O, and intruct them on 
 #how the game is played
-begin
-puts "Player, would you like to be X or O?"
-player_letter = gets.chomp.upcase
-end until player_letter == 'X' || player_letter == 'O'
-computer_letter = "O" if player_letter == "X" 
-computer_letter = "X" if player_letter == "O"
 
+puts "Welcome to Tic-Tac-Toe.  In this game you'll first choose a letter,
+either X or O.  Rhe goal of the game is to place three of your 
+letter in a row on the game board before your opponent can.  This
+includes horizontal, vertical, or diagonal.  Good luck!"
+
+begin
+  puts "Player, would you like to be X or O?"
+  player_letter = gets.chomp.upcase
+end until player_letter == 'X' || player_letter == 'O'
+
+if player_letter == "X" 
+  computer_letter = "O"
+else
+  computer_letter = "X" 
+end
 
 puts "Just to clarify, the top-left square of the board is number 1, the top-middle
 is number two, the left-middle is number 4 and so on."
+
 board = initialize_board
 draw_board(board)
 #Loop until either someone wins
