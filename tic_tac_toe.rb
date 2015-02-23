@@ -1,5 +1,5 @@
 
-
+require 'pry'
 #Hash of possible win positions based around which squares are current empty.
 CHECK_HASH = {
   1 => [[1,2],[3,6],[4,8]],
@@ -36,11 +36,18 @@ def empty_squares(board)
   board.keys.select {|k| board[k] == ' '}
 end
 
-def player_picks_a_square(board,player_letter)
+def player_picks_a_square(board,player_letter,computer_letter)
   puts "These squares are empty,\n#{empty_squares(board).join(' ')}
 please pick one as your move... "
-  player_choice = gets.chomp.to_i
-  board[player_choice] = player_letter
+ 
+  begin 
+    player_choice = gets.chomp.to_i
+    if board[player_choice] == computer_letter
+      puts "Please choose an empty square"
+      next
+    end
+    board[player_choice] = player_letter
+  end until board[player_choice] == player_letter
 end
 
 
@@ -64,14 +71,14 @@ end
 
 #This method is used for computer logic.  It allows the computer to decide whether 
 #to block the player or to try to win the game under differing circumstances.
-def move_if_two_in_a_row(board,player_letter)
+def move_if_two_in_a_row(board,letter)
 
-  if board.values.count(player_letter) >= 2
+  if board.values.count(letter) >= 2
     move =
     empty_squares(board).find do |empty_square|
       CHECK_HASH[empty_square].any? do |value|
-        board.values[value[0]] == player_letter &&
-        board.values[value[1]] == player_letter
+        board.values[value[0]] == letter &&
+        board.values[value[1]] == letter
       end
     end
   end
@@ -82,7 +89,6 @@ end
 
 
 def say_who_won(player,computer)
-
   if player 
     puts "The player won the game."
   elsif computer
@@ -90,33 +96,34 @@ def say_who_won(player,computer)
   else
     puts "Cats game."
   end
-
 end
 
 
 def horizontal_win?(position,squares,letter)
-    bool_horizontal = 
-    %w(squares[position * 3],
+  bool_horizontal = 
+    [squares[position * 3],
     squares[(position * 3) + 1],
-    squares[(position * 3) + 2]).all? {|e| e == letter}
+    squares[(position * 3) + 2]].all? {|e| e == letter}
     
+    #binding.pry
     return bool_horizontal
+    
 end
 
 
 def vertical_win?(position,squares,letter)
-    bool_vertical = 
-    %w(squares[position],
+  bool_vertical = 
+    [squares[position],
     squares[position + 3],
-    squares[position + 6]).all? {|e| e == letter}
-
+    squares[position + 6]].all? {|e| e == letter}
+    #binding.pry
     return bool_vertical  
 end
 
 
 def diagonal_win?(squares,letter)
-  return %w(squares[0],squares[4],squares[8]).all? {|e| e == letter}
-  return %w(squares[2],squares[4],squares[6]).all? {|e| e == letter}
+  return [squares[0],squares[4],squares[8]].all? {|e| e == letter}
+  return [squares[2],squares[4],squares[6]].all? {|e| e == letter}
 end
 
 
@@ -127,6 +134,7 @@ def winner?(board,letter)
   begin  
     return true if horizontal_win?(position,squares,letter)
     return true if vertical_win?(position,squares,letter)
+    #binding.pry
     position += 1
   end while position < 3
 
@@ -154,20 +162,24 @@ else
   computer_letter = "X" 
 end
 
-puts "Just to clarify, the top-left square of the board is number 1, the top-middle
-is number two, the left-middle is number 4 and so on."
+puts "Just to clarify, the top-left square of the board is number 1, the square
+number continues in ascending order from left to right and then down the board,so bottom
+left square is 7, the botttom right is 9."
 
 board = initialize_board
 draw_board(board)
 #Loop until either someone wins
 #or it ends in a cat's game.
+
 begin
-  
-  player_picks_a_square(board,player_letter)
-  player = winner?(board,player_letter)  
+  player_picks_a_square(board,player_letter,computer_letter)
+  player = winner?(board,player_letter)
+
+
   computer_picks_a_square(board,player_letter,computer_letter)
   computer = winner?(board,computer_letter)
 
+  
   draw_board(board)
 end until (player || computer) || empty_squares(board).empty?
 
