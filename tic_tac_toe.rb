@@ -54,6 +54,7 @@ def computer_picks_a_square(board,player_letter,computer_letter)
   
 end
 
+
 #This method is used for computer logic.  It allows the computer to decide whether 
 #to block the player go try to win the game under differing circumstances.
 def move_if_two_in_a_row(board,player_letter)
@@ -87,35 +88,41 @@ def say_who_won(player,computer)
 
 end
 
-#Checks to see if the player has won or the computer.
+
+def horizontal_win?(idx,vals)
+    bool_horizontal = 
+    [vals[idx * 3],vals[(idx * 3) + 1],vals[(idx * 3) + 2]].all? {|e| e == letter}
+    
+    return bool_horizontal
+end
+
+
+def vertical_win?(idx,vals)
+    bool_vertical = 
+    [vals[idx],vals[idx + 3],vals[idx + 6]].all? {|e| e == letter}
+    return true if bool_v  
+end
+
+
+def diagonal_win?(vals)
+  return true if [vals[0],vals[4],vals[8]].all? {|e| e == letter}
+  return true if [vals[2],vals[4],vals[6]].all? {|e| e == letter}
+end
+
+
 def winner?(board,letter)
   vals = board.values
   idx = 0
   
   begin  
-    #Checks vertical win conditions
-    bool_v = 
-    [vals[idx],vals[idx + 3],vals[idx + 6]].all? {|e| e == letter}
-    return true if bool_v  
-    #Checks horizontal win conditions
-    bool_h = 
-    [vals[idx * 3],vals[(idx * 3) + 1],vals[(idx * 3) + 2]].all? {|e| e == letter}
-    return true if bool_h
-
+    return true if horizontal_win?(idx,vals)
+    return true if vertical_win?(idx,vals)
     idx += 1
   end while idx < 3
 
-  #Checks the two diagonal win conditions
-  return true if [vals[0],vals[4],vals[6]].all? {|e| e == letter}
-  return true if [vals[0],vals[4],vals[8]].all? {|e| e == letter}
-
-  #The player or computer has not won, return nil
+  return true if diagonal_win?(vals)
   return nil
 end  
-
-#Initialize the board and draw it's empty state
-board = initialize_board
-
 
 #Prompt the player to pick a letter, either X or O, and intruct them on 
 #how the game is played
@@ -129,25 +136,18 @@ computer_letter = "X" if player_letter == "O"
 
 puts "Just to clarify, the top-left square of the board is number 1, the top-middle
 is number two, the left-middle is number 4 and so on."
-
+board = initialize_board
+draw_board(board)
 #Loop until either someone wins
 #or it ends in a cat's game.
 begin
   
-  #Re-draw the board. 
-  draw_board(board)
-  
-  #Player chooses an empty square
   player_picks_a_square(board,player_letter)
-  computer = winner?(board,computer_letter)
-  #Computer chooses an empty square
-  computer_picks_a_square(board,player_letter,computer_letter)
   player = winner?(board,player_letter)  
-  
+  computer_picks_a_square(board,player_letter,computer_letter)
+  computer = winner?(board,computer_letter)
+
+  draw_board(board)
 end until (player || computer) || empty_squares(board).empty?
 
-#Show final board state.
-draw_board(board)
-
-#Show who won the game or if it ended in a tie.
 say_who_won(player,computer)
