@@ -96,9 +96,9 @@ end
 
 def horizontal_win?(position,squares,letter)
     bool_horizontal = 
-    [squares[position * 3],
+    %w(squares[position * 3],
     squares[(position * 3) + 1],
-    squares[(position * 3) + 2]].all? {|e| e == letter}
+    squares[(position * 3) + 2]).all? {|e| e == letter}
     
     return bool_horizontal
 end
@@ -106,17 +106,17 @@ end
 
 def vertical_win?(position,squares,letter)
     bool_vertical = 
-    [squares[position],
+    %w(squares[position],
     squares[position + 3],
-    squares[position + 6]].all? {|e| e == letter}
+    squares[position + 6]).all? {|e| e == letter}
 
     return bool_vertical  
 end
 
 
 def diagonal_win?(squares,letter)
-  return [squares[0],squares[4],squares[8]].all? {|e| e == letter}
-  return [squares[2],squares[4],squares[6]].all? {|e| e == letter}
+  return %w(squares[0],squares[4],squares[8]).all? {|e| e == letter}
+  return %w(squares[2],squares[4],squares[6]).all? {|e| e == letter}
 end
 
 
@@ -139,9 +139,9 @@ end
 #how the game is played
 
 puts "Welcome to Tic-Tac-Toe.  In this game you'll first choose a letter,
-either X or O.  Rhe goal of the game is to place three of your 
-letter in a row on the game board before your opponent can.  This
-includes horizontal, vertical, or diagonal.  Good luck!"
+either X or O.  The goal of the game is to place three of your 
+letters in a row on the game board before your opponent can.  You can win
+with horizontal, vertical, or diagonal placement.  Good luck!"
 
 begin
   puts "Player, would you like to be X or O?"
