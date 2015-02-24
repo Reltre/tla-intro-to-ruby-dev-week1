@@ -50,7 +50,6 @@ please pick one as your move... "
   end until board[player_choice] == player_letter
 end
 
-
 def computer_picks_a_square(board,player_letter,computer_letter)
   
   #Check if the player doesn't have two in a row, then make a
@@ -67,7 +66,6 @@ def computer_picks_a_square(board,player_letter,computer_letter)
   board[computer_choice] = computer_letter
   
 end
-
 
 #This method is used for computer logic.  It allows the computer to decide whether 
 #to block the player or to try to win the game under differing circumstances.
@@ -87,7 +85,6 @@ def move_if_two_in_a_row(board,letter)
     
 end
 
-
 def say_who_won(player,computer)
   if player 
     puts "The player won the game."
@@ -97,7 +94,6 @@ def say_who_won(player,computer)
     puts "Cats game."
   end
 end
-
 
 def horizontal_win?(position,squares,letter)
   bool_horizontal = 
@@ -110,7 +106,6 @@ def horizontal_win?(position,squares,letter)
     
 end
 
-
 def vertical_win?(position,squares,letter)
   bool_vertical = 
     [squares[position],
@@ -120,12 +115,10 @@ def vertical_win?(position,squares,letter)
     return bool_vertical  
 end
 
-
 def diagonal_win?(squares,letter)
   return [squares[0],squares[4],squares[8]].all? {|e| e == letter}
   return [squares[2],squares[4],squares[6]].all? {|e| e == letter}
 end
-
 
 def winner?(board,letter)
   squares = board.values
